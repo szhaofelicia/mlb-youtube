@@ -21,21 +21,23 @@ def local_clip(filename, start_time, duration, output_filename, output_directory
         output = subprocess.check_output(command, shell=True,
                                          stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as err:
-        print err.output
+        print(err.output)
         return err.output
 
 
 def wrapper(clip):
-    input_directory = '/'
-    output_directory = '/'
+    input_directory = '/media/felicia/Data/mlb-youtube/full_videos/'
+    output_directory = '/media/felicia/Data/mlb-youtube/segmented_videos/'
     duration = clip['end']-clip['start']
     filename = clip['url'].split('=')[-1]
-    local_clip(os.path.join(input_directory,filename+'.mkv'), clip['start'], duration, clip['clip_name']+'.mp4', output_directory)
+    local_clip(os.path.join(input_directory,filename+'.mp4'), clip['start'], duration, clip['clip_name']+'.mp4', output_directory)
     return 0
     
 
 with open('data/mlb-youtube-segmented.json', 'r') as f:
     data = json.load(f)
     pool = multiprocessing.Pool(processes=8)
+    for k in data.keys():
+        data[k]['clip_name']=k
     pool.map(wrapper, [data[k] for k in data.keys()])
     
